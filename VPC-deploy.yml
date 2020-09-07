@@ -1,0 +1,454 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+   This cloud formation template is to automate VPC creation for AWS
+   <Environment>-Portals-VPC-Deployment
+
+Parameters:
+  Environment:
+    Description: This is the name of the environment
+    Type: String
+    AllowedValues:
+      - kgDevOps
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.#.0.0/20
+
+  PubSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+    Default: 10.#.0.0/24
+
+  PubSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Type: String
+    Default: 10.#.1.0/24
+
+  PubSubnet3CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Type: String
+    Default: 10.#.2.0/24
+
+  AppSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.#.3.0/24
+
+  AppSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.#.4.0/24
+
+  AppSubnet3CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.#.5.0/24
+
+  DBSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.#.6.0/24
+
+  DBSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.#.7.0/24
+
+  DBSubnet3CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.#.8.0/24
+
+Resources:
+#####################
+## Creating the VPC##
+#####################
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-VPC
+
+#############
+## Subnets ##
+#############
+  PubSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PubSubnet1CIDR
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-Pub-A
+        - Key: Type
+          Value: Pub
+
+  PubSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref PubSubnet2CIDR
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-Pub-B
+        - Key: Type
+          Value: Pub
+
+  PubSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 2, !GetAZs  '' ]
+      CidrBlock: !Ref PubSubnet3CIDR
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-Pub-C
+        - Key: Type
+          Value: Pub
+
+  AppSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      CidrBlock: !Ref AppSubnet1CIDR
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-App-A
+        - Key: Type
+          Value: App
+
+  AppSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref AppSubnet2CIDR
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-App-B
+        - Key: Type
+          Value: App
+
+  AppSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 2, !GetAZs  '' ]
+      CidrBlock: !Ref AppSubnet3CIDR
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-App-C
+        - Key: Type
+          Value: App
+
+  DBSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref DBSubnet1CIDR
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-DB-A
+        - Key: Type
+          Value: DB
+
+  DBSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref DBSubnet2CIDR
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-DB-B
+        - Key: Type
+          Value: DB
+
+  DBSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 2, !GetAZs  '' ]
+      CidrBlock: !Ref DBSubnet3CIDR
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-DB-C
+        - Key: Type
+          Value: DB
+
+
+######################
+## Internet Gateway ##
+######################
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-VPC-IG
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+
+#################
+## NAT Gateway ##
+#################
+  NatGateway1EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway2EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway3EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway1EIP.AllocationId
+      SubnetId: !Ref PubSubnet1
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-Pub-A
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway2EIP.AllocationId
+      SubnetId: !Ref PubSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-Pub-B
+
+  NatGateway3:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway3EIP.AllocationId
+      SubnetId: !Ref PubSubnet3
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-Pub-C
+
+##################
+## Route Tables ##
+##################
+  PubRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-Pub
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PubRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PubSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PubRouteTable
+      SubnetId: !Ref PubSubnet1
+
+  PubSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PubRouteTable
+      SubnetId: !Ref PubSubnet2
+
+  PubSubnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PubRouteTable
+      SubnetId: !Ref PubSubnet3
+
+###
+  AppRoute1Table:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-App-A
+
+  AppRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref AppRoute1Table
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+
+  AppSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref AppRoute1Table
+      SubnetId: !Ref AppSubnet1
+###
+  AppRoute2Table:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-App-B
+
+  AppRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref AppRoute2Table
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway2
+
+  AppSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref AppRoute2Table
+      SubnetId: !Ref AppSubnet2
+###
+  AppRoute3Table:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-App-C
+
+  AppRoute3:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref AppRoute3Table
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway3
+
+  AppSubnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref AppRoute3Table
+      SubnetId: !Ref AppSubnet3
+###
+  DBRoute1Table:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-DB-A
+
+  DBRoute2Table:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-DB-B
+
+  DBRoute3Table:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-DB-C
+
+Outputs:
+  StackVPC:
+    Description: A reference to the created VPC
+    Value: !Ref VPC
+    Export:
+      Name: !Sub '${AWS::StackName}-StackVpcID'
+
+  StackVpcCidr:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref VpcCIDR
+    Export:
+      Name: !Sub '${AWS::StackName}-StackVpcCidrID'
+
+  AppSubnet1:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref AppSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-AppSubnet1ID'
+
+  AppSubnet2:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref AppSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-AppSubnet2ID'
+
+  AppSubnet3:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref AppSubnet3
+    Export:
+      Name: !Sub '${AWS::StackName}-AppSubnet3ID'
+
+  PubSubnet1:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref PubSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-PubSubnet1ID'
+
+  PubSubnet2:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref PubSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-PubSubnet2ID'
+
+  PubSubnet3:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref PubSubnet3
+    Export:
+      Name: !Sub '${AWS::StackName}-PubSubnet3ID'
+
+  DBSubnet1:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref DBSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-DBSubnet1ID'
+
+  DBSubnet2:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref DBSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-DBSubnet2ID'
+
+  DBSubnet3:
+    Description: A reference to the CIDR for the VPC created
+    Value: !Ref DBSubnet3
+    Export:
+      Name: !Sub '${AWS::StackName}-DBSubnet3ID'

@@ -6,12 +6,12 @@ Parameters:
     serverName:
       Description: DNS name of wordpress site
       Type: String
-      Default: test.arcadian.cloud
+      Default: kgdevops.cloud
 
     serverAdminEmail:
       Description: Email to configure the web server with
       Type: String
-      Default: arcadiancloud@gmail.com
+      Default: kgdevops@gmail.com
     
     AutoScalingReplacingUpdate:
       Description: Whether or not to replace the Wordpress server on ASG update. WARNING! Leave this false unless you want your wordpress server possibly terminated. 
@@ -50,15 +50,16 @@ Parameters:
       AllowedValues:
         - t3a.micro
         - t3a.nano
-      Default: t3a.micro
+        - t2.micro
+      Default: t2.micro
 
     AMI: 
       Description: Instance type to use for wordpress servers
       Type: AWS::EC2::Image::Id
-      Default: ami-0323c3dd2da7fb37d
+      Default: ami-0c94855ba95c71c99
 
 Resources:
-  AutoSaclingGroup:
+  AutoScalingGroup:
     Type: "AWS::AutoScaling::AutoScalingGroup"
     Properties:
       DesiredCapacity: !Ref ASGMinInstances
@@ -84,9 +85,9 @@ Resources:
       KeyName: !Ref Key
       ImageId: !Ref AMI
       SecurityGroups: 
-        - sg-047219abfd849bd57 #ToDo Create SG
+        - sg-0812211e5e9766213 #ToDo Create SG
       InstanceType: !Ref InstanceType
-      IamInstanceProfile: arn:aws:iam::933784155053:instance-profile/Wordpress-Blog #ToDo create IAM Profile / Role
+      IamInstanceProfile: arn:aws:iam::959398616823:role/WordPress-Blog-kgdevops-Role #ToDo create IAM Profile / Role
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda 
           Ebs: 
@@ -101,6 +102,6 @@ Resources:
           echo serverAdminEmail: ${serverAdminEmail}  serverName: ${serverName} > /tmp/test
   
 Outputs:
-  AutoSaclingGroup:
+  AutoScalingGroup:
     Description: Autoscaling group containing the wordpress server/s
-    Value: !Ref AutoSaclingGroup
+    Value: !Ref AutoScalingGroup
